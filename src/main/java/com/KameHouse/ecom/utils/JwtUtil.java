@@ -24,7 +24,7 @@ public class JwtUtil {
 
 
 
-    public static final String SECRET= "5367566B59703373367639792F4528482B4";
+    public static final String SECRET= "413F4428472B4B6250655368566D5970337336763979244226452948404D6351";
 
     public String generateToken(String userName){
 
