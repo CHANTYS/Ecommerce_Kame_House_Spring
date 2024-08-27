@@ -72,8 +72,10 @@ public class AuthController {
                     .toString()
             );
         }
-
-        response.addHeader(HEADER_STRING, TOKEN_PREFIX + jwt);
+        response.setHeader("Access-Control-Expose-Headers", "Authorization");
+        response.setHeader("Access-Control-Allow-Headers", "Authorization, X-PINGOTHER, Origin, " +
+                                 "X-Requested-With, Content-Type, Accept, X-Custom-header");
+        response.setHeader(HEADER_STRING, TOKEN_PREFIX + jwt);
     }
 
     @PostMapping("/sign-up")
