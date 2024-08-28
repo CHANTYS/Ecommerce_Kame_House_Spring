@@ -40,22 +40,20 @@ public class AuthServiceImpl implements AuthService{
         return userDto;
     }
 
-public Boolean hasUserWithEmail(String email){
+    public Boolean hasUserWithEmail(String email){
         return userRepository.findFirstByEmail(email).isPresent();
     }
 
-@PostConstruct
-public void createAdminAccount(){
-        User adminAccount = userRepository.findByRole(UserRole.ADMIN);
-        if(null == adminAccount){
-            User user = new User();
-            user.setEmail("admin@test.com");
-            user.setName("admin");
-            user.setRole(UserRole.ADMIN);
-            user.setPasword(new BCryptPasswordEncoder().encode("admin"));
-            userRepository.save(user);
-        }
-}
-
-
+//    @PostConstruct
+//    public void createAdminAccount(){
+//        User adminAccount = userRepository.findByRole(UserRole.ADMIN);
+//        if(null == adminAccount){
+//            User user = new User();
+//            user.setEmail("admin@test.com");
+//            user.setName("admin");
+//            user.setRole(UserRole.ADMIN);
+//            user.setPasword(new BCryptPasswordEncoder().encode("admin"));
+//            userRepository.save(user);
+//        }
+//    }
 }

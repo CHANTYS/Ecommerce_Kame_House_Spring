@@ -52,7 +52,7 @@ public class AuthController {
 
     @PostMapping("/authenticate")
     public void createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest,
-                                          HttpServletResponse response) throws IOException, JSONException, JSONException {
+                                          HttpServletResponse response) throws IOException, JSONException {
 
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(),
@@ -72,6 +72,7 @@ public class AuthController {
                     .toString()
             );
         }
+
         response.setHeader("Access-Control-Expose-Headers", "Authorization");
         response.setHeader("Access-Control-Allow-Headers", "Authorization, X-PINGOTHER, Origin, " +
                                  "X-Requested-With, Content-Type, Accept, X-Custom-header");
