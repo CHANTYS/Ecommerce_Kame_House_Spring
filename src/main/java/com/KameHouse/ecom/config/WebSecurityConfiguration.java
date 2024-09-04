@@ -33,7 +33,7 @@ public class WebSecurityConfiguration {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers("/authenticate", "/sign-up", "/order/**").permitAll();
-                    req.requestMatchers("/api/**").permitAll();
+                    req.requestMatchers("/api/**").authenticated();
                 })
                 .sessionManagement(opts -> opts.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
