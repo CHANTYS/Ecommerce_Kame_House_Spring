@@ -22,7 +22,7 @@ public class ProductDto {
 
     private byte[] byteImg;
 
-    private Long categoryId;
+    private String categoryName;
 
     private MultipartFile img;
 

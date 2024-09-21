@@ -1,6 +1,5 @@
 package com.KameHouse.ecom.entity;
 
-
 import com.KameHouse.ecom.dto.ProductDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -43,7 +42,7 @@ public class Product {
         productDto.setPrice(price);
         productDto.setDescription(description);
         productDto.setByteImg(img);
-        productDto.setCategoryId(category.getId());
+        productDto.setCategoryName(category.getName());
         return productDto;
     }
 
