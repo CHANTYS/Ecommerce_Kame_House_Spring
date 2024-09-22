@@ -9,7 +9,6 @@ import com.KameHouse.ecom.enums.OrderStatus;
 import com.KameHouse.ecom.enums.UserRole;
 import com.KameHouse.ecom.repository.OrderRepository;
 import com.KameHouse.ecom.repository.UserRepository;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,23 +33,26 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(signupRequest.getEmail());
         user.setName(signupRequest.getName());
         user.setPasword(new BCryptPasswordEncoder().encode(signupRequest.getPassword()));
-        user.setRole(UserRole.CUSTOMER);
+
+        if (signupRequest.getIsAdmin())
+            user.setRole(UserRole.ADMIN);
+        else
+            user.setRole(UserRole.CUSTOMER);
 
         User createdUser = userRepository.save(user);
 
-        //para crear admins sacar esta parte
-        Order order = new Order();
-        order.setAmount(0L);
-        order.setTotalAmount(0L);
-        order.setDiscount(0L);
-        order.setUser(createdUser);
-        order.setOrderStatus(OrderStatus.PENDING);
-        orderRepository.save(order);
-
+        if (!signupRequest.getIsAdmin()) {
+            Order order = new Order();
+            order.setAmount(0L);
+            order.setTotalAmount(0L);
+            order.setDiscount(0L);
+            order.setUser(createdUser);
+            order.setOrderStatus(OrderStatus.PENDING);
+            orderRepository.save(order);
+        }
 
         UserDto userDto = new UserDto();
         userDto.setId(createdUser.getId());
-
 
         return userDto;
     }
