@@ -31,7 +31,7 @@ public class AdminCategoryController {
 
     }
 
-    @GetMapping()
+    @GetMapping("category")
     public ResponseEntity<List<Category>> getAllCategories(){
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
