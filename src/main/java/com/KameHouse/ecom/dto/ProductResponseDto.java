@@ -1,15 +1,10 @@
 package com.KameHouse.ecom.dto;
 
-
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
-
-
 @Data
-public class ProductDto {
-
-
+public class ProductResponseDto {
     private Long id;
 
     private String name;
@@ -22,8 +17,7 @@ public class ProductDto {
 
     private byte[] byteImg;
 
-    private CategoryDto category;
+    private long categoryId;
 
     private MultipartFile img;
-
 }

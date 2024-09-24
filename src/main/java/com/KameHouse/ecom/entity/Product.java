@@ -42,7 +42,8 @@ public class Product {
         productDto.setPrice(price);
         productDto.setDescription(description);
         productDto.setByteImg(img);
-        productDto.setCategoryName(category.getName());
+        productDto.setCategory(category.getDto());
+
         return productDto;
     }
 

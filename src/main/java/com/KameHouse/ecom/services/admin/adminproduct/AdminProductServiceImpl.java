@@ -2,6 +2,7 @@ package com.KameHouse.ecom.services.admin.adminproduct;
 
 
 import com.KameHouse.ecom.dto.ProductDto;
+import com.KameHouse.ecom.dto.ProductResponseDto;
 import com.KameHouse.ecom.entity.Category;
 import com.KameHouse.ecom.entity.Product;
 import com.KameHouse.ecom.repository.CategoryRepository;
@@ -23,18 +24,18 @@ public class AdminProductServiceImpl implements AdminProductService {
 
     private final CategoryRepository categoryRepository;
 
-    public ProductDto addProduct(ProductDto productDto) throws IOException {
+    public ProductDto addProduct(ProductResponseDto productResponseDto) throws IOException {
         Product product = new Product();
-        product.setName(productDto.getName());
-        product.setDescription(productDto.getDescription());
-        product.setPrice(productDto.getPrice());
-        product.setImg(productDto.getImg().getBytes());
+        product.setName(productResponseDto.getName());
+        product.setDescription(productResponseDto.getDescription());
+        product.setPrice(productResponseDto.getPrice());
+        product.setImg(productResponseDto.getImg().getBytes());
 
-        Category category = categoryRepository.findByName(productDto.getCategoryName());
+        Optional<Category> category = categoryRepository.findById(productResponseDto.getCategoryId());
 
-        product.setCategory(category);
+        category.ifPresent(product::setCategory);
+
         return productRepository.save(product).getDto();
-
     }
 
     public List<ProductDto> getAllProduct(){

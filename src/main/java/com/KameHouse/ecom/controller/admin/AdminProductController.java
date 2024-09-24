@@ -2,6 +2,7 @@ package com.KameHouse.ecom.controller.admin;
 
 
 import com.KameHouse.ecom.dto.ProductDto;
+import com.KameHouse.ecom.dto.ProductResponseDto;
 import com.KameHouse.ecom.services.admin.adminproduct.AdminProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,8 +22,8 @@ public class AdminProductController {
 
 
     @PostMapping("/products")
-    public ResponseEntity<ProductDto> addProduct(@ModelAttribute ProductDto productDto) throws IOException {
-        ProductDto productDto1 = adminProductService.addProduct(productDto);
+    public ResponseEntity<ProductDto> addProduct(@ModelAttribute ProductResponseDto productResponseDto) throws IOException {
+        ProductDto productDto1 = adminProductService.addProduct(productResponseDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(productDto1);
     }
 

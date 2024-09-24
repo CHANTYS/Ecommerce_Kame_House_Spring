@@ -1,5 +1,7 @@
 package com.KameHouse.ecom.entity;
 
+import com.KameHouse.ecom.dto.CategoryDto;
+import com.KameHouse.ecom.dto.ProductDto;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,4 +18,13 @@ public class Category {
 
     @Lob
     private String description;
+
+    public CategoryDto getDto() {
+        CategoryDto dto = new CategoryDto();
+        dto.setId(id);
+        dto.setName(name);
+        dto.setDescription(description);
+
+        return dto;
+    }
 }
