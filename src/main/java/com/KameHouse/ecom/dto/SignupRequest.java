@@ -12,5 +12,4 @@ public class SignupRequest {
 
     private String name;
 
-    private Boolean isAdmin;
 }

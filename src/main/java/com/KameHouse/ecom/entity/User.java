@@ -1,17 +1,17 @@
 package com.KameHouse.ecom.entity;
 
+
+import com.KameHouse.ecom.dto.UserDto;
 import com.KameHouse.ecom.enums.UserRole;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Data
-@Table(name="users")
-
+@Table(name = "users")
 public class User {
-
-
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +19,7 @@ public class User {
 
     private String email;
 
-    private String pasword;
+    private String password;
 
     private String name;
 
@@ -27,9 +27,16 @@ public class User {
 
     @Lob
     @Column(columnDefinition = "longblob")
-
     private byte[] img;
 
 
-
+    public UserDto getUserDto() {
+        UserDto userDto = new UserDto();
+        userDto.setId(id);
+        userDto.setName(name);
+        userDto.setEmail(email);
+        userDto.setReturnedImg(img);
+        userDto.setRole(role);
+        return userDto;
+    }
 }

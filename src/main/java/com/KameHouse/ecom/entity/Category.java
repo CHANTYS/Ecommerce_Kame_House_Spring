@@ -1,13 +1,12 @@
 package com.KameHouse.ecom.entity;
 
 import com.KameHouse.ecom.dto.CategoryDto;
-import com.KameHouse.ecom.dto.ProductDto;
-import jakarta.persistence.*;
 import lombok.Data;
+import jakarta.persistence.*;
 
 @Entity
-@Table(name = "category")
 @Data
+@Table(name = "category")
 public class Category {
 
     @Id
@@ -17,14 +16,20 @@ public class Category {
     private String name;
 
     @Lob
+    @Column(name = "description")
     private String description;
 
-    public CategoryDto getDto() {
-        CategoryDto dto = new CategoryDto();
-        dto.setId(id);
-        dto.setName(name);
-        dto.setDescription(description);
-
-        return dto;
+    public void getCategoryEntity(CategoryDto categoryDto) {
+        this.name = categoryDto.getName();
+        this.description = categoryDto.getDescription();
     }
+
+    public CategoryDto getCategoryDto() {
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setId(id);
+        categoryDto.setName(name);
+        categoryDto.setDescription(description);
+        return categoryDto;
+    }
+
 }

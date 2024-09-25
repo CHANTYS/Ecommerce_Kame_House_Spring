@@ -1,12 +1,14 @@
 package com.KameHouse.ecom.controller;
 
 import com.KameHouse.ecom.dto.AuthenticationRequest;
+import com.KameHouse.ecom.dto.ChangePasswordDto;
 import com.KameHouse.ecom.dto.SignupRequest;
 import com.KameHouse.ecom.dto.UserDto;
 import com.KameHouse.ecom.entity.User;
-import com.KameHouse.ecom.repository.UserRepository;
-import com.KameHouse.ecom.services.auth.AuthService;
+import com.KameHouse.ecom.repo.UserRepository;
+import com.KameHouse.ecom.service.auth.AuthService;
 import com.KameHouse.ecom.utils.JwtUtil;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONException;
@@ -15,12 +17,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -37,59 +39,79 @@ public class AuthController {
 
     private final JwtUtil jwtUtil;
 
-
-
-    public static final String TOKEN_PREFIX = "Bearer";
-
-    public static final String HEADER_STRING = "Authorization";
-
-
-
     private final AuthService authService;
 
+    @PostMapping({"/sign-up"})
+    public ResponseEntity<?> signupUser(@RequestBody(required = true) SignupRequest signupRequest)
+            throws Exception {
 
+        if (authService.hasUserWithEmail(signupRequest.getEmail()))
+            return new ResponseEntity<>("User already exists", HttpStatus.NOT_ACCEPTABLE);
 
+        UserDto createdUser = authService.createUser(signupRequest);
+        if (createdUser == null)
+            return new ResponseEntity<>("User not created, come again later", HttpStatus.NOT_ACCEPTABLE);
+
+        return new ResponseEntity<>(createdUser, HttpStatus.OK);
+    }
+
+    public static final String TOKEN_PREFIX = "Bearer ";
+    public static final String HEADER_STRING = "Authorization";
 
     @PostMapping("/authenticate")
-    public void createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest,
-                                          HttpServletResponse response) throws IOException, JSONException {
-
+    public void createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest, HttpServletResponse response) throws BadCredentialsException, DisabledException, UsernameNotFoundException, IOException, JSONException, ServletException {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(),
-                    authenticationRequest.getPassword()));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
         } catch (BadCredentialsException e) {
-            throw new BadCredentialsException("Usuario o contraseña incorrecta.");
+            throw new BadCredentialsException("Incorrect username or password.");
+        } catch (DisabledException disabledException) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "User is not activated");
+            return;
         }
-
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         Optional<User> optionalUser = userRepository.findFirstByEmail(userDetails.getUsername());
         final String jwt = jwtUtil.generateToken(userDetails.getUsername());
 
-        if(optionalUser.isPresent()){
+        if (optionalUser.isPresent()) {
             response.getWriter().write(new JSONObject()
                     .put("userId", optionalUser.get().getId())
                     .put("role", optionalUser.get().getRole())
                     .toString()
             );
+            response.addHeader("Access-Control-Expose-Headers", "Authorization");
+            response.addHeader("Access-Control-Allow-Headers", "Authorization, X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept, X-Custom-header");
+            response.addHeader(HEADER_STRING, TOKEN_PREFIX + jwt);
         }
-
-        response.setHeader("Access-Control-Expose-Headers", "Authorization");
-        response.setHeader("Access-Control-Allow-Headers", "Authorization, X-PINGOTHER, Origin, " +
-                                 "X-Requested-With, Content-Type, Accept, X-Custom-header");
-        response.setHeader(HEADER_STRING, TOKEN_PREFIX + jwt);
     }
 
-    @PostMapping("/sign-up")
-    public ResponseEntity<?> signupUser(@RequestBody SignupRequest signupRequest){
-
-        if(authService.hasUserWithEmail(signupRequest.getEmail())){
-            return new ResponseEntity<>("Usuario ya existente", HttpStatus.NOT_ACCEPTABLE);
+    @PostMapping("/api/update")
+    public ResponseEntity<UserDto> updateProfile(@ModelAttribute UserDto userDto) throws IOException {
+        UserDto updatedUser = authService.updateUser(userDto);
+        if (updatedUser != null) {
+            return ResponseEntity.ok(updatedUser);
+        } else {
+            return ResponseEntity.notFound().build();
         }
-
-
-        UserDto userDto = authService.createUser(signupRequest);
-        return new ResponseEntity<>(userDto, HttpStatus.OK);
-
     }
+
+    @GetMapping("/api/user/{userId}")
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long userId) {
+        UserDto userDto = authService.getUserById(userId);
+        if (userDto != null) {
+            return ResponseEntity.ok(userDto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/api/updatePassword")
+    public ResponseEntity<?> updatePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+        try {
+            return authService.updatePasswordById(changePasswordDto);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong");
+        }
+    }
+
 
 }
