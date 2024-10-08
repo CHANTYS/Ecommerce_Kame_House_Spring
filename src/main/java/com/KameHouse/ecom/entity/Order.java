@@ -1,14 +1,12 @@
 package com.KameHouse.ecom.entity;
 
-import jakarta.persistence.*;
+import com.KameHouse.ecom.dto.OrderDto;
+import com.KameHouse.ecom.enums.OrderStatus;
 import lombok.Data;
-
+import jakarta.persistence.*;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
-import static jakarta.persistence.CascadeType.MERGE;
-import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Data
@@ -29,7 +27,7 @@ public class Order {
 
     private String payment;
 
-    private com.KameHouse.ecom.enums.OrderStatus orderStatus;
+    private OrderStatus status;
 
     private Long totalAmount;
 
@@ -37,10 +35,32 @@ public class Order {
 
     private UUID trackingId;
 
-    @OneToOne(cascade = MERGE)
+    @OneToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "coupon_id", referencedColumnName = "id")
+    private Coupon coupon;
+
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @OneToMany(fetch = LAZY, mappedBy = "order")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
     private List<CartItems> cartItems;
+
+    public OrderDto getOrderDto() {
+        OrderDto orderDto = new OrderDto();
+        orderDto.setId(id);
+        orderDto.setOrderDescription(orderDescription);
+        orderDto.setAddress(address);
+        orderDto.setTrackingId(trackingId);
+        orderDto.setAmount(amount);
+        orderDto.setDate(date);
+        orderDto.setPayment(payment);
+        orderDto.setStatus(status);
+        orderDto.setUserName(user.getName());
+        if(coupon != null){
+            orderDto.setCouponName(coupon.getName());
+        }
+        return orderDto;
+    }
+
 }

@@ -1,7 +1,9 @@
 package com.KameHouse.ecom.controller.customer;
 
+import com.KameHouse.ecom.dto.CategoryDto;
+import com.KameHouse.ecom.dto.CompleteProductDetailDto;
 import com.KameHouse.ecom.dto.ProductDto;
-import com.KameHouse.ecom.services.coustomer.CustomerProductService;
+import com.KameHouse.ecom.service.customer.product.CustomerProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,15 +20,35 @@ public class CustomerProductController {
 
     private final CustomerProductService customerProductService;
 
-    @GetMapping("/products")
-    public ResponseEntity<List<ProductDto>> getAllProducts(){
-        List<ProductDto> productDtos = customerProductService.getAllProduct();
+    @GetMapping("/categories")
+    public ResponseEntity<List<CategoryDto>> getAllCategories() {
+        List<CategoryDto> categoryDtos = customerProductService.getAllCategories();
+        return ResponseEntity.ok(categoryDtos);
+    }
+
+    @GetMapping("/search/{title}")
+    public ResponseEntity<List<ProductDto>> searchProductByTitle(@PathVariable("title") String title) {
+        List<ProductDto> productDtos = customerProductService.searchProductByTitle(title);
         return ResponseEntity.ok(productDtos);
     }
 
-    @GetMapping("/search/{name}")
-    public ResponseEntity<List<ProductDto>> getAllProductByName(@PathVariable String name){
-        List<ProductDto> productDtos = customerProductService.searchProductByName(name);
+    @GetMapping("/products")
+    public ResponseEntity<List<ProductDto>> getAllProducts() {
+        List<ProductDto> productDtos = customerProductService.getAllProducts();
         return ResponseEntity.ok(productDtos);
     }
+
+    @GetMapping("/products/{categoryId}")
+    public ResponseEntity<List<ProductDto>> getProductsByCategoryId(@PathVariable Long categoryId) {
+        List<ProductDto> productDtos = customerProductService.getProductsByCategory(categoryId);
+        return ResponseEntity.ok(productDtos);
+    }
+
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<CompleteProductDetailDto> getProductDetailById(@PathVariable Long productId) {
+        CompleteProductDetailDto completeProductDetailDto = customerProductService.getCompleteProductDetailById(productId);
+        if (completeProductDetailDto == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(completeProductDetailDto);
+    }
+
 }

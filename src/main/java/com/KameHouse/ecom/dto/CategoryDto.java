@@ -1,7 +1,7 @@
 package com.KameHouse.ecom.dto;
 
-
 import lombok.Data;
+
 
 @Data
 public class CategoryDto {
@@ -11,4 +11,5 @@ public class CategoryDto {
     private String name;
 
     private String description;
+
 }

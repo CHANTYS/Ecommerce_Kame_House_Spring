@@ -3,6 +3,7 @@ package com.KameHouse.ecom.dto;
 
 import com.KameHouse.ecom.enums.UserRole;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class UserDto {
@@ -13,7 +14,10 @@ public class UserDto {
 
     private String name;
 
-    private UserRole userRole;
+    private UserRole role;
 
+    private MultipartFile img;
+
+    private byte[] returnedImg;
 
 }
