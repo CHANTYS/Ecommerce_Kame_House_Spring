@@ -11,6 +11,8 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Data
 public class CartItems {
@@ -27,7 +29,7 @@ public class CartItems {
     @JoinColumn(name = "product_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private Product product;
+    private List<Product> product;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
@@ -43,11 +45,10 @@ public class CartItems {
         CartItemsDto cartItemsDto = new CartItemsDto();
         cartItemsDto.setId(id);
         cartItemsDto.setPrice(price);
-        cartItemsDto.setProductId(product.getId());
         cartItemsDto.setQuantity(quantity);
         cartItemsDto.setUserId(user.getId());
-        cartItemsDto.setProductName(product.getName());
-        cartItemsDto.setReturnedImg(product.getImg());
+//        cartItemsDto.setProductName(product.getName());
+//        cartItemsDto.setReturnedImg(product.getImg());
         return cartItemsDto;
     }
 

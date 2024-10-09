@@ -98,7 +98,7 @@ public class CartServiceImpl implements CartService {
     public OrderDto decreaseProductQuantity(QuantityChangeProductDto quantityChangeProductDto) {
         Order order = orderRepository.findByUserIdAndStatus(quantityChangeProductDto.getUserId(), OrderStatus.Pending);
         Optional<Product> optionalProduct = productRepository.findById(quantityChangeProductDto.getProductId());
-        Optional<CartItems> optionalCartItem = cartRepository.findByProductIdAndOrderIdAndUserId(quantityChangeProductDto.getProductId(), order.getId(), quantityChangeProductDto.getUserId());
+        Optional<CartItems> optionalCartItem = cartRepository.findByProductIdAndUserId(quantityChangeProductDto.getProductId(), quantityChangeProductDto.getUserId());
         CartItems cartItem = optionalCartItem.get();
         order.setAmount(order.getAmount() - optionalProduct.get().getPrice());
         order.setTotalAmount(order.getTotalAmount() - optionalProduct.get().getPrice());
@@ -123,7 +123,7 @@ public class CartServiceImpl implements CartService {
     public OrderDto increaseProductQuantity(QuantityChangeProductDto quantityChangeProductDto) {
         Order order = orderRepository.findByUserIdAndStatus(quantityChangeProductDto.getUserId(), OrderStatus.Pending);
         Optional<Product> optionalProduct = productRepository.findById(quantityChangeProductDto.getProductId());
-        Optional<CartItems> optionalCartItem = cartRepository.findByProductIdAndOrderIdAndUserId(quantityChangeProductDto.getProductId(), order.getId(), quantityChangeProductDto.getUserId());
+        Optional<CartItems> optionalCartItem = cartRepository.findByProductIdAndUserId(quantityChangeProductDto.getProductId(), quantityChangeProductDto.getUserId());
         CartItems cartItem = optionalCartItem.get();
         Product product = optionalProduct.get();
         order.setAmount(order.getAmount() + optionalProduct.get().getPrice());

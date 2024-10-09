@@ -29,27 +29,27 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public OrderedProductsResponseDto getOrderedProductsDetailsByOrderId(Long orderId) {
-        List<CartItems> cartItems = cartRepository.findByOrderId(orderId);
-        Optional<Order> optionalOrder = orderRepository.findById(orderId);
-        OrderedProductsResponseDto orderedProductsResponseDto = new OrderedProductsResponseDto();
-        if (optionalOrder.isPresent()) {
-            Long orderAmount = optionalOrder.get().getAmount();
-            orderedProductsResponseDto.setOrderAmount(orderAmount);
-        }
-        if (!cartItems.isEmpty()) {
-            List<OrderedProductDetails> orderedProductDetailsList = new ArrayList<>();
-            for (CartItems cartItem : cartItems) {
-                OrderedProductDetails productDetails = new OrderedProductDetails();
-                productDetails.setId(cartItem.getProduct().getId());
-                productDetails.setName(cartItem.getProduct().getName());
-                productDetails.setProductPrice(cartItem.getPrice());
-                productDetails.setQuantity(cartItem.getQuantity());
-                productDetails.setReturnedImg(cartItem.getProduct().getImg());
-                orderedProductDetailsList.add(productDetails);
-            }
-            orderedProductsResponseDto.setOrderedProductDetailsList(orderedProductDetailsList);
-        }
-        return orderedProductsResponseDto;
+//        List<CartItems> cartItems = cartRepository.findByOrderId(orderId);
+//        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+//        OrderedProductsResponseDto orderedProductsResponseDto = new OrderedProductsResponseDto();
+//        if (optionalOrder.isPresent()) {
+//            Long orderAmount = optionalOrder.get().getAmount();
+//            orderedProductsResponseDto.setOrderAmount(orderAmount);
+//        }
+//        if (!cartItems.isEmpty()) {
+//            List<OrderedProductDetails> orderedProductDetailsList = new ArrayList<>();
+//            for (CartItems cartItem : cartItems) {
+//                OrderedProductDetails productDetails = new OrderedProductDetails();
+////                productDetails.setId(cartItem.getProduct().getId());
+////                productDetails.setName(cartItem.getProduct().getName());
+//                productDetails.setProductPrice(cartItem.getPrice());
+//                productDetails.setQuantity(cartItem.getQuantity());
+////                productDetails.setReturnedImg(cartItem.getProduct().getImg());
+//                orderedProductDetailsList.add(productDetails);
+//            }
+//            orderedProductsResponseDto.setOrderedProductDetailsList(orderedProductDetailsList);
+//        }
+        return new OrderedProductsResponseDto();
     }
 
     @Override
