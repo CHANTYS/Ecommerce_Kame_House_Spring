@@ -2,6 +2,7 @@ package com.KameHouse.ecom.service.customer.cart;
 
 import com.KameHouse.ecom.dto.CartItemsDto;
 import com.KameHouse.ecom.dto.OrderDto;
+import com.KameHouse.ecom.dto.ProductDto;
 import com.KameHouse.ecom.dto.QuantityChangeProductDto;
 import com.KameHouse.ecom.entity.CartItems;
 import com.KameHouse.ecom.entity.Order;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,6 +41,59 @@ public class CartServiceImpl implements CartService {
     @Override
     public ResponseEntity<?> addProductToCart(CartItemsDto cartItemsDto) {
 
+
+
+        if(cartItemsDto.getId() ==null || cartItemsDto.getId()==0 ){
+           CartItems carrito = new CartItems();
+            List<Product> products = new ArrayList<Product>();
+
+
+            for (ProductDto productDto : cartItemsDto.getProductDtos()) {
+                Product p1 = new Product();
+                p1.setId(productDto.getId());
+                products.add(p1);
+            }
+            User user1 = new User();
+            user1.setId(cartItemsDto.getUserId());
+            carrito.setProducts(products);
+            carrito.setQuantity(cartItemsDto.getQuantity());
+            carrito.setPrice(cartItemsDto.getPrice());
+            carrito.setUser(user1);
+
+
+           cartRepository.save(new CartItems());
+
+
+        }else {
+
+
+           var carrito = cartRepository.findById(cartItemsDto.getId());
+
+                if(carrito.isPresent()){
+
+                    List<Product> products = new ArrayList<Product>();
+
+
+                    for (ProductDto productDto : cartItemsDto.getProductDtos()) {
+                        Product p1 = new Product();
+                        p1.setId(productDto.getId());
+                        products.add(p1);
+                    }
+                    User user1 = new User();
+                    user1.setId(cartItemsDto.getUserId());
+                    carrito.setProducts(products);
+                    carrito.setQuantity(cartItemsDto.getQuantity());
+                    carrito.setPrice(cartItemsDto.getPrice());
+                    carrito.setUser(user1);
+
+
+                    cartRepository.save(carrito);
+                }
+
+
+
+
+        }
 
 
         /*       Order pendingOrder = orderRepository.findByUserIdAndStatus(cartItemsDto.getUserId(), OrderStatus.Pending);
