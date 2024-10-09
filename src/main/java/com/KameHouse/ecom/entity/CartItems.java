@@ -25,8 +25,7 @@ public class CartItems {
 
     private Long quantity;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
+    @ManyToMany(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private List<Product> products;

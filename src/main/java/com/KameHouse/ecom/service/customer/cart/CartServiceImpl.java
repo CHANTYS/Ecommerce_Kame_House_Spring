@@ -40,19 +40,16 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public ResponseEntity<?> addProductToCart(CartItemsDto cartItemsDto) {
-
-
-
-        if(cartItemsDto.getId() ==null || cartItemsDto.getId()==0 ){
-           CartItems carrito = new CartItems();
+        if(cartItemsDto.getId() == null || cartItemsDto.getId() == 0){
+            CartItems carrito = new CartItems();
             List<Product> products = new ArrayList<Product>();
-
 
             for (ProductDto productDto : cartItemsDto.getProductDtos()) {
                 Product p1 = new Product();
                 p1.setId(productDto.getId());
                 products.add(p1);
             }
+
             User user1 = new User();
             user1.setId(cartItemsDto.getUserId());
             carrito.setProducts(products);
@@ -60,39 +57,34 @@ public class CartServiceImpl implements CartService {
             carrito.setPrice(cartItemsDto.getPrice());
             carrito.setUser(user1);
 
+            var saved = cartRepository.save(carrito);
 
-           cartRepository.save(new CartItems());
-
-
+            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
         }else {
+            var carrito = cartRepository.findById(cartItemsDto.getId());
 
+            if(carrito.isPresent()) {
+                List<Product> products = new ArrayList<>();
 
-           var carrito = cartRepository.findById(cartItemsDto.getId());
-
-                if(carrito.isPresent()){
-
-                    List<Product> products = new ArrayList<Product>();
-
-
-                    for (ProductDto productDto : cartItemsDto.getProductDtos()) {
-                        Product p1 = new Product();
-                        p1.setId(productDto.getId());
-                        products.add(p1);
-                    }
-                    User user1 = new User();
-                    user1.setId(cartItemsDto.getUserId());
-                    carrito.setProducts(products);
-                    carrito.setQuantity(cartItemsDto.getQuantity());
-                    carrito.setPrice(cartItemsDto.getPrice());
-                    carrito.setUser(user1);
-
-
-                    cartRepository.save(carrito);
+                for (ProductDto productDto : cartItemsDto.getProductDtos()) {
+                    Product p1 = new Product();
+                    p1.setId(productDto.getId());
+                    products.add(p1);
                 }
+                User user1 = new User();
+                user1.setId(cartItemsDto.getUserId());
 
+                carrito.get().setProducts(products);
+                carrito.get().setQuantity(cartItemsDto.getQuantity());
+                carrito.get().setPrice(cartItemsDto.getPrice());
+                carrito.get().setUser(user1);
 
+                var saved = cartRepository.save(carrito.get());
 
-
+                return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+            }
+            else
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error when update cart");
         }
 
 
@@ -128,7 +120,6 @@ public class CartServiceImpl implements CartService {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or product not found");
             }
         }*/
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or product not found");
     }
 
     @Override
@@ -151,55 +142,57 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public OrderDto decreaseProductQuantity(QuantityChangeProductDto quantityChangeProductDto) {
-        Order order = orderRepository.findByUserIdAndStatus(quantityChangeProductDto.getUserId(), OrderStatus.Pending);
-        Optional<Product> optionalProduct = productRepository.findById(quantityChangeProductDto.getProductId());
-        Optional<CartItems> optionalCartItem = cartRepository.findByProductIdAndUserId(quantityChangeProductDto.getProductId(), quantityChangeProductDto.getUserId());
-        CartItems cartItem = optionalCartItem.get();
-        order.setAmount(order.getAmount() - optionalProduct.get().getPrice());
-        order.setTotalAmount(order.getTotalAmount() - optionalProduct.get().getPrice());
-        cartItem.setQuantity(optionalCartItem.get().getQuantity() - 1);
+//        Order order = orderRepository.findByUserIdAndStatus(quantityChangeProductDto.getUserId(), OrderStatus.Pending);
+//        Optional<Product> optionalProduct = productRepository.findById(quantityChangeProductDto.getProductId());
+//        Optional<CartItems> optionalCartItem = cartRepository.findByProductIdAndUserId(quantityChangeProductDto.getProductId(), quantityChangeProductDto.getUserId());
+//        CartItems cartItem = optionalCartItem.get();
+//        order.setAmount(order.getAmount() - optionalProduct.get().getPrice());
+//        order.setTotalAmount(order.getTotalAmount() - optionalProduct.get().getPrice());
+//        cartItem.setQuantity(optionalCartItem.get().getQuantity() - 1);
+//
+//        if(order.getCoupon() != null){
+//            double discountAmount = ((order.getCoupon().getDiscount() / 100.0) * order.getTotalAmount());
+//            double netAmount = order.getTotalAmount() - discountAmount;
+//
+//            long discountAmountLong = (long) discountAmount;
+//            long netAmountLong = (long) netAmount;
+//
+//            order.setAmount(netAmountLong);
+//            order.setDiscount(discountAmountLong);
+//        }
+//
+//        cartRepository.save(cartItem);
+//        orderRepository.save(order);
+//        return order.getOrderDto();
 
-        if(order.getCoupon() != null){
-            double discountAmount = ((order.getCoupon().getDiscount() / 100.0) * order.getTotalAmount());
-            double netAmount = order.getTotalAmount() - discountAmount;
-
-            long discountAmountLong = (long) discountAmount;
-            long netAmountLong = (long) netAmount;
-
-            order.setAmount(netAmountLong);
-            order.setDiscount(discountAmountLong);
-        }
-        cartRepository.save(cartItem);
-        orderRepository.save(order);
-        return order.getOrderDto();
+        return new OrderDto();
     }
 
     @Override
     public OrderDto increaseProductQuantity(QuantityChangeProductDto quantityChangeProductDto) {
-        Order order = orderRepository.findByUserIdAndStatus(quantityChangeProductDto.getUserId(), OrderStatus.Pending);
-        Optional<Product> optionalProduct = productRepository.findById(quantityChangeProductDto.getProductId());
-        Optional<CartItems> optionalCartItem = cartRepository.findByProductIdAndUserId(quantityChangeProductDto.getProductId(), quantityChangeProductDto.getUserId());
-        CartItems cartItem = optionalCartItem.get();
-        Product product = optionalProduct.get();
-        order.setAmount(order.getAmount() + optionalProduct.get().getPrice());
-        order.setTotalAmount(order.getTotalAmount() + optionalProduct.get().getPrice());
-        cartItem.setQuantity(optionalCartItem.get().getQuantity() + 1);
-
-        if(order.getCoupon() != null){
-            double discountAmount = ((order.getCoupon().getDiscount() / 100.0) * order.getTotalAmount());
-            double netAmount = order.getTotalAmount() - discountAmount;
-
-            long discountAmountLong = (long) discountAmount;
-            long netAmountLong = (long) netAmount;
-
-            order.setAmount(netAmountLong);
-            order.setDiscount(discountAmountLong);
-        }
-        cartRepository.save(cartItem);
-        orderRepository.save(order);
-        return order.getOrderDto();
+//        Order order = orderRepository.findByUserIdAndStatus(quantityChangeProductDto.getUserId(), OrderStatus.Pending);
+//        Optional<Product> optionalProduct = productRepository.findById(quantityChangeProductDto.getProductId());
+//        Optional<CartItems> optionalCartItem = cartRepository.findByProductIdAndUserId(quantityChangeProductDto.getProductId(), quantityChangeProductDto.getUserId());
+//        CartItems cartItem = optionalCartItem.get();
+//        Product product = optionalProduct.get();
+//        order.setAmount(order.getAmount() + optionalProduct.get().getPrice());
+//        order.setTotalAmount(order.getTotalAmount() + optionalProduct.get().getPrice());
+//        cartItem.setQuantity(optionalCartItem.get().getQuantity() + 1);
+//
+//        if(order.getCoupon() != null){
+//            double discountAmount = ((order.getCoupon().getDiscount() / 100.0) * order.getTotalAmount());
+//            double netAmount = order.getTotalAmount() - discountAmount;
+//
+//            long discountAmountLong = (long) discountAmount;
+//            long netAmountLong = (long) netAmount;
+//
+//            order.setAmount(netAmountLong);
+//            order.setDiscount(discountAmountLong);
+//        }
+//
+//        cartRepository.save(cartItem);
+//        orderRepository.save(order);
+//        return order.getOrderDto();
+        return new OrderDto();
     }
-
-
 }
-

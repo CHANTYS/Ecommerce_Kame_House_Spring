@@ -36,8 +36,11 @@ public class Product {
     @JsonIgnore
     private Category category;
 
-    @ManyToMany(mappedBy = "products" )
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "products")
     private List<Order> Orders;
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "products")
+    private List<CartItems> CartItems;
 
     public ProductDto getProductDto() {
         ProductDto productDto = new ProductDto();
