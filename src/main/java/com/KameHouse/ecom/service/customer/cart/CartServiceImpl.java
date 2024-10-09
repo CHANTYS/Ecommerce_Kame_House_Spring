@@ -38,7 +38,10 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public ResponseEntity<?> addProductToCart(CartItemsDto cartItemsDto) {
-        Order pendingOrder = orderRepository.findByUserIdAndStatus(cartItemsDto.getUserId(), OrderStatus.Pending);
+
+
+
+        /*       Order pendingOrder = orderRepository.findByUserIdAndStatus(cartItemsDto.getUserId(), OrderStatus.Pending);
         Optional<CartItems> cartItem = cartRepository.findByProductIdAndOrderIdAndUserId(cartItemsDto.getProductId(), pendingOrder.getId(), cartItemsDto.getUserId());
         if (cartItem.isPresent()) {
             CartItemsDto productAlreadyExistsInCart = new CartItemsDto();
@@ -69,13 +72,14 @@ public class CartServiceImpl implements CartService {
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or product not found");
             }
-        }
+        }*/
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or product not found");
     }
 
     @Override
     public OrderDto getCartByUserId(Long userId) {
         Order order = orderRepository.findByUserIdAndStatus(userId, OrderStatus.Pending);
-        List<CartItemsDto> cartItemsDtos = order.getCartItems().stream().map(CartItems::getCartDto).collect(Collectors.toList());
+      /*  List<CartItemsDto> cartItemsDtos = order.getCartItems().stream().map(CartItems::getCartDto).collect(Collectors.toList());
         OrderDto orderDto = new OrderDto();
         orderDto.setCartItems(cartItemsDtos);
         orderDto.setAmount(order.getAmount());
@@ -86,8 +90,8 @@ public class CartServiceImpl implements CartService {
             orderDto.setCouponName(order.getCoupon().getName());
         }
 
-        orderDto.setTotalAmount(order.getTotalAmount());
-        return orderDto;
+        orderDto.setTotalAmount(order.getTotalAmount());     */
+        return new OrderDto();
     }
 
     @Override

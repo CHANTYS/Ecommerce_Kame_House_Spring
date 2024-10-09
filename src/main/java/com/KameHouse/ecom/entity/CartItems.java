@@ -23,22 +23,22 @@ public class CartItems {
 
     private Long quantity;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Product product;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private User user;
 
-    @OneToOne(fetch = FetchType.LAZY)
+   /* @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
-
+    */
     public CartItemsDto getCartDto() {
         CartItemsDto cartItemsDto = new CartItemsDto();
         cartItemsDto.setId(id);

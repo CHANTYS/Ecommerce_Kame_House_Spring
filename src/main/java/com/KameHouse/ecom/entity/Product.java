@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.List;
+
 @Entity
 @Data
 @Table(name = "product")
@@ -33,6 +35,9 @@ public class Product {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Category category;
+
+    @ManyToMany(mappedBy = "products" )
+    private List<Order> Orders;
 
     public ProductDto getProductDto() {
         ProductDto productDto = new ProductDto();

@@ -13,7 +13,7 @@ public class CartItemsDto {
 
     private Long productId;
 
-    private Long orderId;
+   // private Long orderId;
 
     private String productName;
 

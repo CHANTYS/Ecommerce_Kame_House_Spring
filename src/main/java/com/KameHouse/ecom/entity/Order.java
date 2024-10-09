@@ -43,8 +43,8 @@ public class Order {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
-    private List<CartItems> cartItems;
+    @ManyToMany
+    private List<Product> products;
 
     public OrderDto getOrderDto() {
         OrderDto orderDto = new OrderDto();
