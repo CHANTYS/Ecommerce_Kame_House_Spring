@@ -1,5 +1,6 @@
 package com.KameHouse.ecom.controller.customer;
 
+import com.KameHouse.ecom.dto.AddCartItemDto;
 import com.KameHouse.ecom.dto.CartItemsDto;
 import com.KameHouse.ecom.dto.OrderDto;
 import com.KameHouse.ecom.dto.QuantityChangeProductDto;
@@ -17,7 +18,7 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping("/cart")
-    public ResponseEntity<?> addProductToCart(@RequestBody CartItemsDto cartItemsDto) {
+    public ResponseEntity<?> addProductToCart(@RequestBody AddCartItemDto cartItemsDto) {
         return cartService.addProductToCart(cartItemsDto);
     }
 

@@ -7,6 +7,10 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @Entity
 @Data
 @Table(name = "product")
@@ -33,6 +37,21 @@ public class Product {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Category category;
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "products")
+    private List<Order> Orders;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product")
+    @JsonIgnore
+    private Set<CartItemsProducts> cartItemsProducts = new HashSet<>();
+
+    public Set<CartItemsProducts> getCartItemsProducts() {
+        return cartItemsProducts;
+    }
+
+    public void setCartItemsProducts(Set<CartItemsProducts> cartItemsProducts) {
+        this.cartItemsProducts = cartItemsProducts;
+    }
 
     public ProductDto getProductDto() {
         ProductDto productDto = new ProductDto();

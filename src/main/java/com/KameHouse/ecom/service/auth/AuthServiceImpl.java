@@ -11,6 +11,7 @@ import com.KameHouse.ecom.repo.OrderRepository;
 import com.KameHouse.ecom.repo.UserRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,16 +23,11 @@ import java.util.Optional;
 
 
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @PostConstruct
     public void createAdminAccount() {
@@ -51,20 +47,13 @@ public class AuthServiceImpl implements AuthService {
         User user = new User();
         user.setEmail(signupRequest.getEmail());
         user.setName(signupRequest.getName());
-        user.setPassword(new BCryptPasswordEncoder().encode(signupRequest.getPassword()));
+        user.setPassword(bCryptPasswordEncoder.encode(signupRequest.getPassword()));
         user.setRole(UserRole.CUSTOMER);
         User createdUser = userRepository.save(user);
 
-        Order order = new Order();
-        order.setAmount(0L);
-        order.setTotalAmount(0L);
-        order.setDiscount(0L);
-        order.setUser(user);
-        order.setStatus(OrderStatus.Pending);
-
-        orderRepository.save(order);
         UserDto createdUserDto = new UserDto();
         createdUserDto.setId(createdUser.getId());
+
         return createdUserDto;
     }
 
@@ -128,5 +117,3 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 }
-
-
