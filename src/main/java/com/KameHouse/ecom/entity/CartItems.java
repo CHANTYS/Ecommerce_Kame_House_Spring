@@ -2,6 +2,8 @@ package com.KameHouse.ecom.entity;
 
 
 import com.KameHouse.ecom.dto.CartItemsDto;
+import com.KameHouse.ecom.dto.GetCartItemDto;
+import com.KameHouse.ecom.dto.GetProductDto;
 import com.KameHouse.ecom.dto.ProductDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
@@ -83,4 +85,23 @@ public class CartItems {
             @JoinColumn(name = "order_id")
             private Order order;
             */
+
+    public GetCartItemDto GetCartItemDto() {
+        GetCartItemDto dto = new GetCartItemDto();
+        dto.setId(id);
+        dto.setQuantity(quantity);
+        dto.setPrice(price);
+
+        cartItemsProducts.forEach(item -> {
+            GetProductDto productDto = new GetProductDto();
+            productDto.setProductName(item.getProduct().getName());
+            productDto.setReturnedImg(item.getProduct().getImg());
+            productDto.setQuantity(item.getQuantity());
+            productDto.setId(item.getProduct().getId());
+            productDto.setPrice(item.getProduct().getPrice());
+            dto.getProductDtos().add(productDto);
+        });
+
+        return dto;
+    }
 }
