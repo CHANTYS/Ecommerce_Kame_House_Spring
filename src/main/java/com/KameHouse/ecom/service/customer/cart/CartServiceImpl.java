@@ -1,125 +1,105 @@
 package com.KameHouse.ecom.service.customer.cart;
 
-import com.KameHouse.ecom.dto.CartItemsDto;
-import com.KameHouse.ecom.dto.OrderDto;
-import com.KameHouse.ecom.dto.ProductDto;
-import com.KameHouse.ecom.dto.QuantityChangeProductDto;
-import com.KameHouse.ecom.entity.CartItems;
-import com.KameHouse.ecom.entity.Order;
-import com.KameHouse.ecom.entity.Product;
-import com.KameHouse.ecom.entity.User;
+import com.KameHouse.ecom.dto.*;
+import com.KameHouse.ecom.entity.*;
 import com.KameHouse.ecom.enums.OrderStatus;
 import com.KameHouse.ecom.repo.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
+@RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
 
-    @Autowired
-    private OrderRepository orderRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final OrderRepository orderRepository;
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private CartRepository cartRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final CartRepository cartRepository;
+
+    private final CartItemsProductsRepository cartItemsProductsRepository;
+
+    private final CategoryRepository categoryRepository;
 
     @Override
-    public ResponseEntity<?> addProductToCart(CartItemsDto cartItemsDto) {
-        if(cartItemsDto.getId() == null || cartItemsDto.getId() == 0){
-            CartItems carrito = new CartItems();
-            List<Product> products = new ArrayList<Product>();
+    public ResponseEntity<?> addProductToCart(AddCartItemDto cartItemsDto) {
+        boolean existsUser = userRepository.existsById(cartItemsDto.getUserId());
+        if (!existsUser)
+            return ResponseEntity.badRequest().body("Error when update cart, user not exists");
 
-            for (ProductDto productDto : cartItemsDto.getProductDtos()) {
-                Product p1 = new Product();
-                p1.setId(productDto.getId());
-                products.add(p1);
-            }
+        boolean exists = productRepository.existsById(cartItemsDto.getProductId());
+        if (!exists)
+            return ResponseEntity.badRequest().body("Error when update cart, products not exists");
+
+        CartItems cartItems;
+        boolean existsCart = cartRepository.existsByUserId(cartItemsDto.getUserId());
+        if (existsCart) {
+            cartItems = cartRepository.findByUserId(cartItemsDto.getUserId());
+
+            boolean existsProdOnCart = cartItems.getCartItemsProducts()
+                                            .stream()
+                                            .anyMatch(product -> product.getCartItemsProductsKey().getProductId().equals(cartItemsDto.getProductId()));
+
+            if (existsProdOnCart)
+                return ResponseEntity.badRequest().body("Error when update cart, product exists");
+
+            Product product = productRepository.findById(cartItemsDto.getProductId()).get();
+
+            Set<Product> products = cartItems.getCartItemsProducts().stream().map(CartItemsProducts::getProduct).collect(Collectors.toSet());
+            products.add(product);
+
+            cartItems.setQuantity((long)products.size());
+
+            AtomicReference<Long> totalPrice = new AtomicReference<>(0L);
+            products.forEach(x -> {
+                totalPrice.updateAndGet(v -> v + x.getPrice());
+            });
+
+            cartItems.setPrice(totalPrice.get());
+
+            CartItemsProducts cartItemsProducts = new CartItemsProducts();
+            cartItemsProducts.setProduct(product);
+            cartItemsProducts.setCartItems(cartItems);
+
+            var savedCart = cartItemsProductsRepository.save(cartItemsProducts);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedCart.getCartItems());
+        }
+        else {
+            cartItems = new CartItems();
 
             User user1 = new User();
             user1.setId(cartItemsDto.getUserId());
-            carrito.setProducts(products);
-            carrito.setQuantity(cartItemsDto.getQuantity());
-            carrito.setPrice(cartItemsDto.getPrice());
-            carrito.setUser(user1);
 
-            var saved = cartRepository.save(carrito);
+            cartItems.setUser(user1);
 
+            Product product = productRepository.findById(cartItemsDto.getProductId()).get();
+
+            cartItems.setPrice(product.getPrice());
+            cartItems.setQuantity(1L);
+
+            CartItems savedCart = cartRepository.save(cartItems);
+
+            CartItemsProducts cartItemsProducts = new CartItemsProducts();
+            cartItemsProducts.setCartItems(savedCart);
+            cartItemsProducts.setProduct(product);
+
+            CartItemsProducts saved = cartItemsProductsRepository.save(cartItemsProducts);
             return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-        }else {
-            var carrito = cartRepository.findById(cartItemsDto.getId());
-
-            if(carrito.isPresent()) {
-                List<Product> products = new ArrayList<>();
-
-                for (ProductDto productDto : cartItemsDto.getProductDtos()) {
-                    Product p1 = new Product();
-                    p1.setId(productDto.getId());
-                    products.add(p1);
-                }
-                User user1 = new User();
-                user1.setId(cartItemsDto.getUserId());
-
-                carrito.get().setProducts(products);
-                carrito.get().setQuantity(cartItemsDto.getQuantity());
-                carrito.get().setPrice(cartItemsDto.getPrice());
-                carrito.get().setUser(user1);
-
-                var saved = cartRepository.save(carrito.get());
-
-                return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-            }
-            else
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error when update cart");
         }
-
-
-        /*       Order pendingOrder = orderRepository.findByUserIdAndStatus(cartItemsDto.getUserId(), OrderStatus.Pending);
-        Optional<CartItems> cartItem = cartRepository.findByProductIdAndOrderIdAndUserId(cartItemsDto.getProductId(), pendingOrder.getId(), cartItemsDto.getUserId());
-        if (cartItem.isPresent()) {
-            CartItemsDto productAlreadyExistsInCart = new CartItemsDto();
-            productAlreadyExistsInCart.setProductId(null);
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(productAlreadyExistsInCart);
-        } else {
-            Product product = null;
-            Optional<Product> optionalProduct = productRepository.findById(cartItemsDto.getProductId());
-            Optional<User> optionalUser = userRepository.findById(cartItemsDto.getUserId());
-            Order runningOrder = orderRepository.findByUserIdAndStatus(cartItemsDto.getUserId(), OrderStatus.Pending);
-            if (optionalProduct.isPresent() && optionalUser.isPresent()) {
-                product = optionalProduct.get();
-                CartItems cart = new CartItems();
-                cart.setProduct(product);
-                cart.setPrice(product.getPrice());
-                cart.setQuantity(1L);
-                cart.setUser(optionalUser.get());
-                cart.setOrder(runningOrder);
-                CartItems updatedCart = cartRepository.save(cart);
-                Order order = orderRepository.findByUserAndStatus(optionalUser.get(), OrderStatus.Pending);
-                order.setAmount(order.getAmount() + cart.getPrice());
-                order.setTotalAmount(order.getTotalAmount() + cart.getPrice());
-                order.getCartItems().add(cart);
-                orderRepository.save(order);
-                CartItemsDto productAddedToCartDto = new CartItemsDto();
-                productAddedToCartDto.setId(updatedCart.getId());
-                return ResponseEntity.status(HttpStatus.CREATED).body(productAddedToCartDto);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or product not found");
-            }
-        }*/
     }
 
     @Override
