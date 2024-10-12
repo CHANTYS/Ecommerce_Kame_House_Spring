@@ -33,4 +33,9 @@ public class CartController {
     public ResponseEntity<?> increaseProductQuantity(@RequestBody QuantityChangeProductDto quantityChangeProductDto) {
         return cartService.increaseProductQuantity(quantityChangeProductDto);
     }
+
+    @PostMapping("/removeProductToCart")
+    public ResponseEntity<?> removeProductToCart(@RequestBody RemoveProductToCartDto removeProductToCartDto) {
+        return cartService.removeProductToCart(removeProductToCartDto);
+    }
 }

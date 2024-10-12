@@ -15,4 +15,6 @@ public interface CartService {
     ResponseEntity<?> decreaseProductQuantity(QuantityChangeProductDto quantityChangeProductDto);
 
     ResponseEntity<?> increaseProductQuantity(QuantityChangeProductDto quantityChangeProductDto);
+
+    ResponseEntity<?> removeProductToCart(RemoveProductToCartDto removeProductToCartDto);
 }

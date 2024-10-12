@@ -58,26 +58,35 @@ public class CartServiceImpl implements CartService {
 
             Product product = productRepository.findById(cartItemsDto.getProductId()).get();
 
-            Set<Product> products = cartItems.getCartItemsProducts().stream().map(CartItemsProducts::getProduct).collect(Collectors.toSet());
-            products.add(product);
-
-            cartItems.setQuantity((long)products.size());
-
-            AtomicReference<Double> totalPrice = new AtomicReference<>(0D);
-            products.forEach(x -> {
-                totalPrice.updateAndGet(v -> v + x.getPrice());
-            });
-
-            cartItems.setPrice(totalPrice.get());
 
             CartItemsProducts cartItemsProducts = new CartItemsProducts();
-            cartItemsProducts.setProduct(product);
             cartItemsProducts.setCartItems(cartItems);
+            cartItemsProducts.setProduct(product);
             cartItemsProducts.setQuantity(1L);
 
             var savedCart = cartItemsProductsRepository.save(cartItemsProducts);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedCart.getCartItems());
+            cartItems.getCartItemsProducts().add(savedCart);
+
+            AtomicReference<Long> totalQuantity = new AtomicReference<>(0L);
+
+            cartItems.getCartItemsProducts().forEach(x -> {
+                totalQuantity.updateAndGet(y -> y + x.getQuantity());
+            });
+
+            cartItems.setQuantity(totalQuantity.get());
+
+            AtomicReference<Double> totalAmount = new AtomicReference<>(0D);
+
+            cartItems.getCartItemsProducts().forEach(x -> {
+                totalAmount.updateAndGet(y -> y + x.getProduct().getPrice() * x.getQuantity());
+            });
+
+            cartItems.setPrice(totalAmount.get());
+
+            cartRepository.save(cartItems);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedCart.GetCartItemDto());
         }
         else {
             cartItems = new CartItems();
@@ -100,7 +109,7 @@ public class CartServiceImpl implements CartService {
             cartItemsProducts.setQuantity(1L);
 
             CartItemsProducts saved = cartItemsProductsRepository.save(cartItemsProducts);
-            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+            return ResponseEntity.status(HttpStatus.CREATED).body(saved.GetCartItemDto());
         }
     }
 
@@ -111,21 +120,8 @@ public class CartServiceImpl implements CartService {
             return ResponseEntity.badRequest().body("Error when get cart, cart not exists");
 
         CartItems cartItems = cartRepository.findByUserId(userId);
-        GetCartItemDto response = new GetCartItemDto();
-        response.setId(cartItems.getId());
-        response.setQuantity(cartItems.getQuantity());
-        response.setPrice(cartItems.getPrice());
 
-        cartItems.getCartItemsProducts().forEach(item -> {
-            GetProductDto productDto = new GetProductDto();
-            productDto.setProductName(item.getProduct().getName());
-            productDto.setReturnedImg(item.getProduct().getImg());
-            productDto.setQuantity(item.getQuantity());
-            productDto.setId(item.getProduct().getId());
-            productDto.setPrice(item.getProduct().getPrice());
-            response.getProductDtos().add(productDto);
-        });
-
+        return ResponseEntity.ok(cartItems.GetCartItemDto());
         //        Order order = orderRepository.findByUserIdAndStatus(userId, OrderStatus.Pending);
       /*  List<CartItemsDto> cartItemsDtos = order.getCartItems().stream().map(CartItems::getCartDto).collect(Collectors.toList());
         OrderDto orderDto = new OrderDto();
@@ -139,7 +135,6 @@ public class CartServiceImpl implements CartService {
         }
 
         orderDto.setTotalAmount(order.getTotalAmount());     */
-        return ResponseEntity.ok(response);
     }
 
     @Override
@@ -176,9 +171,9 @@ public class CartServiceImpl implements CartService {
 
         cartItemsProducts.setCartItems(cartItems);
 
-        CartItemsProducts saved = cartItemsProductsRepository.save(cartItemsProducts);
+        cartItemsProductsRepository.save(cartItemsProducts);
 
-        return ResponseEntity.ok(saved.GetCartItemDto());
+        return ResponseEntity.noContent().build();
         //        Order order = orderRepository.findByUserIdAndStatus(quantityChangeProductDto.getUserId(), OrderStatus.Pending);
 //        Optional<Product> optionalProduct = productRepository.findById(quantityChangeProductDto.getProductId());
 //        Optional<CartItems> optionalCartItem = cartRepository.findByProductIdAndUserId(quantityChangeProductDto.getProductId(), quantityChangeProductDto.getUserId());
@@ -234,9 +229,9 @@ public class CartServiceImpl implements CartService {
 
         cartItemsProducts.setCartItems(cartItems);
 
-        CartItemsProducts saved = cartItemsProductsRepository.save(cartItemsProducts);
+        cartItemsProductsRepository.save(cartItemsProducts);
 
-        return ResponseEntity.ok(saved.GetCartItemDto());
+        return ResponseEntity.noContent().build();
         //        Order order = orderRepository.findByUserIdAndStatus(quantityChangeProductDto.getUserId(), OrderStatus.Pending);
 //        Optional<Product> optionalProduct = productRepository.findById(quantityChangeProductDto.getProductId());
 //        Optional<CartItems> optionalCartItem = cartRepository.findByProductIdAndUserId(quantityChangeProductDto.getProductId(), quantityChangeProductDto.getUserId());
@@ -260,5 +255,35 @@ public class CartServiceImpl implements CartService {
 //        cartRepository.save(cartItem);
 //        orderRepository.save(order);
 //        return order.getOrderDto();
+    }
+
+    @Override
+    public ResponseEntity<?> removeProductToCart(RemoveProductToCartDto removeProductToCartDto) {
+        boolean existsCartItem = cartRepository.existsByUserId(removeProductToCartDto.getUserId());
+        if (!existsCartItem)
+            return ResponseEntity.badRequest().body("Error when increase product, product not exists");
+
+        CartItems cartItems = cartRepository.findByUserId(removeProductToCartDto.getUserId());
+        boolean existsProduct = cartItems.getCartItemsProducts()
+                .stream()
+                .anyMatch(x -> x.getProduct().getId().equals(removeProductToCartDto.getProductId()));
+        if (!existsProduct)
+            return ResponseEntity.badRequest().body("Error when increase product, product not exists");
+
+
+        CartItemsProducts cartItemsProducts = cartItems.getCartItemsProducts()
+                                                        .stream()
+                                                        .filter(x -> x.getProduct().getId().equals(removeProductToCartDto.getProductId()))
+                                                        .findFirst().get();
+
+        cartItems.setQuantity(cartItems.getQuantity() - cartItemsProducts.getQuantity());
+        cartItems.setPrice(cartItems.getPrice() - (cartItemsProducts.getQuantity() * cartItemsProducts.getProduct().getPrice()));
+
+        cartItems.getCartItemsProducts().remove(cartItemsProducts);
+
+        cartItemsProductsRepository.delete(cartItemsProducts);
+        cartRepository.delete(cartItems);
+
+        return ResponseEntity.noContent().build();
     }
 }
