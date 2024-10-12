@@ -63,7 +63,7 @@ public class CartServiceImpl implements CartService {
 
             cartItems.setQuantity((long)products.size());
 
-            AtomicReference<Long> totalPrice = new AtomicReference<>(0L);
+            AtomicReference<Double> totalPrice = new AtomicReference<>(0D);
             products.forEach(x -> {
                 totalPrice.updateAndGet(v -> v + x.getPrice());
             });
@@ -103,8 +103,28 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public OrderDto getCartByUserId(Long userId) {
-        Order order = orderRepository.findByUserIdAndStatus(userId, OrderStatus.Pending);
+    public ResponseEntity<?> getCartByUserId(Long userId) {
+        boolean existsCartItem = cartRepository.existsByUserId(userId);
+        if (!existsCartItem)
+            return ResponseEntity.badRequest().body("Error when get cart, cart not exists");
+
+        CartItems cartItems = cartRepository.findByUserId(userId);
+
+        GetCartItemDto response = new GetCartItemDto();
+        response.setId(cartItems.getId());
+        response.setQuantity(cartItems.getQuantity());
+        response.setPrice(cartItems.getPrice());
+
+        cartItems.getCartItemsProducts().forEach(item -> {
+            GetProductDto productDto = new GetProductDto();
+            productDto.setProductName(item.getProduct().getName());
+            productDto.setReturnedImg(item.getProduct().getImg());
+            productDto.setQuantity(item.getQuantity());
+            productDto.setId(item.getProduct().getId());
+            productDto.setPrice(item.getProduct().getPrice());
+            response.getProductDtos().add(productDto);
+        });
+        //        Order order = orderRepository.findByUserIdAndStatus(userId, OrderStatus.Pending);
       /*  List<CartItemsDto> cartItemsDtos = order.getCartItems().stream().map(CartItems::getCartDto).collect(Collectors.toList());
         OrderDto orderDto = new OrderDto();
         orderDto.setCartItems(cartItemsDtos);
@@ -117,7 +137,7 @@ public class CartServiceImpl implements CartService {
         }
 
         orderDto.setTotalAmount(order.getTotalAmount());     */
-        return new OrderDto();
+        return ResponseEntity.ok(response);
     }
 
     @Override

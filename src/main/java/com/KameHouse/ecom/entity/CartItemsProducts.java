@@ -37,4 +37,14 @@ public class CartItemsProducts {
     public void setProduct(Product product) {
         this.product = product;
     }
+
+    private Long quantity;
+
+    public Long getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Long quantity) {
+        this.quantity = quantity;
+    }
 }

@@ -1,7 +1,7 @@
 package com.KameHouse.ecom.service.admin.adminproduct;
 
 import com.KameHouse.ecom.dto.ProductDto;
-import com.KameHouse.ecom.dto.SecondProductDto;
+import com.KameHouse.ecom.dto.AddProductDto;
 import com.KameHouse.ecom.entity.Category;
 import com.KameHouse.ecom.entity.Product;
 import com.KameHouse.ecom.repo.CategoryRepository;
@@ -23,13 +23,13 @@ public class AdminProductServiceImpl implements AdminProductService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public Product addProduct(SecondProductDto secondProductDto) throws IOException {
+    public Product addProduct(AddProductDto addProductDto) throws IOException {
         Product product = new Product();
-        product.setName(secondProductDto.getName());
-        product.setPrice(secondProductDto.getPrice());
-        product.setDescription(secondProductDto.getDescription());
-        product.setImg(secondProductDto.getImg().getBytes());
-        Category category = categoryRepository.findById(Long.parseLong(secondProductDto.getCategoryId())).orElseThrow(() -> new RuntimeException("Category not found"));
+        product.setName(addProductDto.getName());
+        product.setPrice(addProductDto.getPrice());
+        product.setDescription(addProductDto.getDescription());
+        product.setImg(addProductDto.getImg().getBytes());
+        Category category = categoryRepository.findById(Long.parseLong(addProductDto.getCategoryId())).orElseThrow(() -> new RuntimeException("Category not found"));
         product.setCategory(category);
         return productRepository.save(product);
     }

@@ -4,8 +4,8 @@ import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 @Data
-public class SecondProductDto {
-
+public class AddProductDto {
+-
     private Long id;
 
     private String name;
@@ -14,7 +14,7 @@ public class SecondProductDto {
 
     private Long availableQuantity;
 
-    private Long price;
+    private Double price;
 
     private String description;
 

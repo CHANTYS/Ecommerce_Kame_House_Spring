@@ -22,7 +22,7 @@ public class Product {
 
     private String name;
 
-    private Long price;
+    private Double price;
 
     @Lob
     @Column(name = "description")

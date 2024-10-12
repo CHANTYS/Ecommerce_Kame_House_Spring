@@ -2,7 +2,7 @@ package com.KameHouse.ecom.service.admin.adminproduct;
 
 
 import com.KameHouse.ecom.dto.ProductDto;
-import com.KameHouse.ecom.dto.SecondProductDto;
+import com.KameHouse.ecom.dto.AddProductDto;
 import com.KameHouse.ecom.entity.Product;
 
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface AdminProductService {
 
-    Product addProduct(SecondProductDto secondProductDto) throws IOException;
+    Product addProduct(AddProductDto addProductDto) throws IOException;
 
     List<ProductDto> getAllProducts();
 
