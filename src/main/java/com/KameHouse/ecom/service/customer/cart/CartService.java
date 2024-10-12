@@ -12,9 +12,7 @@ public interface CartService {
 
     ResponseEntity<?>  getCartByUserId(Long userId);
 
-    OrderDto decreaseProductQuantity(QuantityChangeProductDto quantityChangeProductDto);
+    ResponseEntity<?> decreaseProductQuantity(QuantityChangeProductDto quantityChangeProductDto);
 
-    OrderDto increaseProductQuantity(QuantityChangeProductDto quantityChangeProductDto);
-
-
+    ResponseEntity<?> increaseProductQuantity(QuantityChangeProductDto quantityChangeProductDto);
 }

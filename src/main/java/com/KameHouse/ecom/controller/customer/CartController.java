@@ -25,15 +25,12 @@ public class CartController {
     }
 
     @PostMapping("/deduction")
-    public ResponseEntity<OrderDto> addMinusOnProduct(@RequestBody QuantityChangeProductDto quantityChangeProductDto) {
-        OrderDto orderDto = cartService.decreaseProductQuantity(quantityChangeProductDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderDto);
+    public ResponseEntity<?> addMinusOnProduct(@RequestBody QuantityChangeProductDto quantityChangeProductDto) {
+        return cartService.decreaseProductQuantity(quantityChangeProductDto);
     }
 
     @PostMapping("/addition")
-    public ResponseEntity<OrderDto> increaseProductQuantity(@RequestBody QuantityChangeProductDto quantityChangeProductDto) {
-        OrderDto OrderDto = cartService.increaseProductQuantity(quantityChangeProductDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(OrderDto);
+    public ResponseEntity<?> increaseProductQuantity(@RequestBody QuantityChangeProductDto quantityChangeProductDto) {
+        return cartService.increaseProductQuantity(quantityChangeProductDto);
     }
-
 }

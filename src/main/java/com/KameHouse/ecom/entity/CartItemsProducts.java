@@ -1,5 +1,7 @@
 package com.KameHouse.ecom.entity;
 
+import com.KameHouse.ecom.dto.GetCartItemDto;
+import com.KameHouse.ecom.dto.GetProductDto;
 import jakarta.persistence.*;
 
 @Entity
@@ -46,5 +48,24 @@ public class CartItemsProducts {
 
     public void setQuantity(Long quantity) {
         this.quantity = quantity;
+    }
+
+    public GetCartItemDto GetCartItemDto() {
+        GetCartItemDto dto = new GetCartItemDto();
+        dto.setId(cartItems.getId());
+        dto.setQuantity(cartItems.getQuantity());
+        dto.setPrice(cartItems.getPrice());
+
+        cartItems.getCartItemsProducts().forEach(item -> {
+            GetProductDto productDto = new GetProductDto();
+            productDto.setProductName(item.getProduct().getName());
+            productDto.setReturnedImg(item.getProduct().getImg());
+            productDto.setQuantity(item.getQuantity());
+            productDto.setId(item.getProduct().getId());
+            productDto.setPrice(item.getProduct().getPrice());
+            dto.getProductDtos().add(productDto);
+        });
+
+        return dto;
     }
 }
