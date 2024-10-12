@@ -1,7 +1,7 @@
 package com.KameHouse.ecom.controller.admin;
 
 import com.KameHouse.ecom.dto.ProductDto;
-import com.KameHouse.ecom.dto.SecondProductDto;
+import com.KameHouse.ecom.dto.AddProductDto;
 import com.KameHouse.ecom.entity.Product;
 import com.KameHouse.ecom.service.admin.adminproduct.AdminProductService;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ public class AdminProductController {
     private final AdminProductService adminProductService;
 
     @PostMapping("/product")
-    public ResponseEntity<Product> addProduct(@ModelAttribute SecondProductDto secondProductDto) throws IOException {
-        Product product = adminProductService.addProduct(secondProductDto);
+    public ResponseEntity<Product> addProduct(@ModelAttribute AddProductDto addProductDto) throws IOException {
+        Product product = adminProductService.addProduct(addProductDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 

@@ -1,9 +1,6 @@
 package com.KameHouse.ecom.controller.customer;
 
-import com.KameHouse.ecom.dto.AddCartItemDto;
-import com.KameHouse.ecom.dto.CartItemsDto;
-import com.KameHouse.ecom.dto.OrderDto;
-import com.KameHouse.ecom.dto.QuantityChangeProductDto;
+import com.KameHouse.ecom.dto.*;
 import com.KameHouse.ecom.service.customer.cart.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,9 +20,8 @@ public class CartController {
     }
 
     @GetMapping("/cart/{userId}")
-    public ResponseEntity<OrderDto> getCartByUserId(@PathVariable Long userId) {
-        OrderDto orderDto = cartService.getCartByUserId(userId);
-        return ResponseEntity.status(HttpStatus.OK).body(orderDto);
+    public ResponseEntity<?> getCartByUserId(@PathVariable Long userId) {
+        return cartService.getCartByUserId(userId);
     }
 
     @PostMapping("/deduction")

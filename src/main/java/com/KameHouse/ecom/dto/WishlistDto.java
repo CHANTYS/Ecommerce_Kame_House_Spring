@@ -17,7 +17,7 @@ public class WishlistDto {
 
     private byte[] returnedImg;
 
-    private Long price;
+    private Double price;
 
 }
 
