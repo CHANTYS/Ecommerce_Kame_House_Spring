@@ -12,8 +12,8 @@ public class AnalyticsResponse {
 
     private Long currentMonthOrders;
     private Long previousMonthOrders;
-    private Long currentMonthEarnings;
-    private Long previousMonthEarnings;
+    private Double currentMonthEarnings;
+    private Double previousMonthEarnings;
 
     private Long placed;
     private Long shipped;

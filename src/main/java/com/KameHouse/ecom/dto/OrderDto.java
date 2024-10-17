@@ -21,7 +21,7 @@ public class OrderDto {
 
     private UUID trackingId;
 
-    private Long amount;
+    private Long quantity;
 
     private String address;
 
@@ -31,7 +31,7 @@ public class OrderDto {
 
     private String userName;
 
-    private Long totalAmount;
+    private Double totalAmount;
 
     private Long discount;
     private String couponName;

@@ -31,10 +31,9 @@ public class CustomerCouponServiceImpl implements CustomerCouponService {
         double discountAmount = ((coupon.getDiscount() / 100.0) * order.getTotalAmount());
         double netAmount = order.getTotalAmount() - discountAmount;
 
-        order.setAmount((long) netAmount);
-        order.setDiscount((long) discountAmount);
+        order.setTotalAmount(netAmount);
+        order.setDiscount(discountAmount);
         order.setCoupon(coupon);
-
 
         orderRepository.save(order);
         return order.getOrderDto();

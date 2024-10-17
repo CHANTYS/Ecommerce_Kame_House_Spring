@@ -31,7 +31,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
             orderDto.setOrderDescription(order.getOrderDescription());
             orderDto.setDate(order.getDate());
             orderDto.setTrackingId(order.getTrackingId());
-            orderDto.setAmount(order.getAmount());
+            orderDto.setQuantity(order.getQuantity());
             orderDto.setPayment(order.getPayment());
             orderDto.setAddress(order.getAddress());
             orderDto.setStatus(order.getStatus());
@@ -65,8 +65,8 @@ public class AdminOrderServiceImpl implements AdminOrderService {
         Long currentMonthOrders = getTotalOrdersForMonth(currentDate.getMonthValue(), currentDate.getYear());
         Long previousMonthOrders = getTotalOrdersForMonth(previousMonthDate.getMonthValue(), previousMonthDate.getYear());
 
-        Long currentMonthEarnings = getTotalEarningsForMonth(currentDate.getMonthValue(), currentDate.getYear());
-        Long previousMonthEarnings = getTotalEarningsForMonth(previousMonthDate.getMonthValue(), previousMonthDate.getYear());
+        Double currentMonthEarnings = getTotalEarningsForMonth(currentDate.getMonthValue(), currentDate.getYear());
+        Double previousMonthEarnings = getTotalEarningsForMonth(previousMonthDate.getMonthValue(), previousMonthDate.getYear());
 
         Long placed = orderRepository.countByStatus(OrderStatus.Placed);
         Long shipped = orderRepository.countByStatus(OrderStatus.Shipped);
@@ -76,7 +76,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
                 shipped, delivered);
     }
 
-    public Long getTotalEarningsForMonth(int month,int year) {
+    private Double getTotalEarningsForMonth(int month,int year) {
         // Create a Calendar instance and set it to the start of the specified year and month
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, year);
@@ -99,10 +99,11 @@ public class AdminOrderServiceImpl implements AdminOrderService {
         // Fetch orders within the specified date range
         List<Order> orders = orderRepository.findByDateBetweenAndStatus(startOfMonth, endOfMonth, OrderStatus.Delivered);
 
-        Long sum = 0L;
+        Double sum = 0D;
         for (Order order : orders) {
-            sum += order.getAmount();
+            sum += order.getTotalAmount();
         }
+
         return sum;
     }
 
