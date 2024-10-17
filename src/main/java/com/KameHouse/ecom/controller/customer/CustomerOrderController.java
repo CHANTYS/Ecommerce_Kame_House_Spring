@@ -19,9 +19,8 @@ public class CustomerOrderController {
     private final CustomerOrderService customerOrderService;
 
     @PostMapping("/placeOrder")
-    public ResponseEntity<OrderDto> placeOrder(@RequestBody PlaceOrderDto placeOrderDto) {
-        OrderDto OrderDto = customerOrderService.PlaceOrder(placeOrderDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(OrderDto);
+    public ResponseEntity<?> placeOrder(@RequestBody PlaceOrderDto placeOrderDto) {
+        return customerOrderService.PlaceOrder(placeOrderDto);
     }
 
     @GetMapping("/myOrders/{userId}")

@@ -21,7 +21,7 @@ public class Order {
 
     private Date date;
 
-    private Long amount;
+    private Long quantity;
 
     private String address;
 
@@ -29,17 +29,17 @@ public class Order {
 
     private OrderStatus status;
 
-    private Long totalAmount;
+    private Double totalAmount;
 
-    private Long discount;
+    private Double discount;
 
     private UUID trackingId;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "coupon_id", referencedColumnName = "id")
     private Coupon coupon;
 
-    @OneToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
@@ -52,7 +52,7 @@ public class Order {
         orderDto.setOrderDescription(orderDescription);
         orderDto.setAddress(address);
         orderDto.setTrackingId(trackingId);
-        orderDto.setAmount(amount);
+        orderDto.setQuantity(quantity);
         orderDto.setDate(date);
         orderDto.setPayment(payment);
         orderDto.setStatus(status);
