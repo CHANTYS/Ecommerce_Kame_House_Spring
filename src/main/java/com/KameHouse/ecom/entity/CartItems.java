@@ -1,23 +1,16 @@
 package com.KameHouse.ecom.entity;
 
-
-import com.KameHouse.ecom.dto.CartItemsDto;
 import com.KameHouse.ecom.dto.GetCartItemDto;
 import com.KameHouse.ecom.dto.GetProductDto;
-import com.KameHouse.ecom.dto.ProductDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import jakarta.persistence.*;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -35,14 +28,14 @@ public class CartItems {
         this.id = id;
     }
 
-    private Double price;
+    private Double totalAmount;
 
-    public Double getPrice() {
-        return price;
+    public Double getTotalAmount() {
+        return totalAmount;
     }
 
-    public void setPrice(Double price) {
-        this.price = price;
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
     private Long quantity;
@@ -86,11 +79,45 @@ public class CartItems {
             private Order order;
             */
 
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "coupon_id", referencedColumnName = "id")
+    private Coupon coupon;
+
+    public Coupon getCoupon() {
+        return coupon;
+    }
+
+    public void setCoupon(Coupon coupon) {
+        this.coupon = coupon;
+    }
+
+    private Double discount;
+
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
+
+    private Double amount;
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
     public GetCartItemDto GetCartItemDto() {
         GetCartItemDto dto = new GetCartItemDto();
         dto.setId(id);
         dto.setQuantity(quantity);
-        dto.setPrice(price);
+        dto.setTotalAmount(totalAmount);
+        dto.setAmount(amount);
+        dto.setDiscount(discount);
 
         cartItemsProducts.forEach(item -> {
             GetProductDto productDto = new GetProductDto();
@@ -101,6 +128,10 @@ public class CartItems {
             productDto.setPrice(item.getProduct().getPrice());
             dto.getProductDtos().add(productDto);
         });
+
+        if(coupon != null) {
+            dto.setCouponName(coupon.getName());
+        }
 
         return dto;
     }

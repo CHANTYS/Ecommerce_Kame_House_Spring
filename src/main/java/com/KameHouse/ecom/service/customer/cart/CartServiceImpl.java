@@ -21,9 +21,6 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
 
-
-    private final OrderRepository orderRepository;
-
     private final UserRepository userRepository;
 
     private final ProductRepository productRepository;
@@ -31,8 +28,6 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
 
     private final CartItemsProductsRepository cartItemsProductsRepository;
-
-    private final CategoryRepository categoryRepository;
 
     @Override
     public ResponseEntity<?> addProductToCart(AddCartItemDto cartItemsDto) {
@@ -82,7 +77,8 @@ public class CartServiceImpl implements CartService {
                 totalAmount.updateAndGet(y -> y + x.getProduct().getPrice() * x.getQuantity());
             });
 
-            cartItems.setPrice(totalAmount.get());
+            cartItems.setAmount(totalAmount.get());
+            cartItems.setTotalAmount(totalAmount.get());
 
             cartRepository.save(cartItems);
 
@@ -98,7 +94,8 @@ public class CartServiceImpl implements CartService {
 
             Product product = productRepository.findById(cartItemsDto.getProductId()).get();
 
-            cartItems.setPrice(product.getPrice());
+            cartItems.setTotalAmount(product.getPrice());
+            cartItems.setAmount(product.getPrice());
             cartItems.setQuantity(1L);
 
             CartItems savedCart = cartRepository.save(cartItems);
@@ -120,6 +117,8 @@ public class CartServiceImpl implements CartService {
             return ResponseEntity.badRequest().body("Error when get cart, cart not exists");
 
         CartItems cartItems = cartRepository.findByUserId(userId);
+
+        System.out.println(cartItems.GetCartItemDto());
 
         return ResponseEntity.ok(cartItems.GetCartItemDto());
         //        Order order = orderRepository.findByUserIdAndStatus(userId, OrderStatus.Pending);
@@ -167,7 +166,19 @@ public class CartServiceImpl implements CartService {
             totalAmount.updateAndGet(y -> y + x.getProduct().getPrice() * x.getQuantity());
         });
 
-        cartItems.setPrice(totalAmount.get());
+
+        cartItems.setAmount(totalAmount.get());
+
+        if(cartItems.getCoupon() != null) {
+            double discountAmount = ((cartItems.getCoupon().getDiscount() / 100.0) * cartItems.getTotalAmount());
+            double netAmount = totalAmount.get() - discountAmount;
+
+            cartItems.setDiscount(discountAmount);
+            cartItems.setTotalAmount(netAmount);
+        }
+        else {
+            cartItems.setTotalAmount(totalAmount.get());
+        }
 
         cartItemsProducts.setCartItems(cartItems);
 
@@ -225,7 +236,18 @@ public class CartServiceImpl implements CartService {
             totalAmount.updateAndGet(y -> y + x.getProduct().getPrice() * x.getQuantity());
         });
 
-        cartItems.setPrice(totalAmount.get());
+        cartItems.setAmount(totalAmount.get());
+
+        if(cartItems.getCoupon() != null) {
+            double discountAmount = ((cartItems.getCoupon().getDiscount() / 100.0) * cartItems.getTotalAmount());
+            double netAmount = totalAmount.get() - discountAmount;
+
+            cartItems.setDiscount(discountAmount);
+            cartItems.setTotalAmount(netAmount);
+        }
+        else {
+            cartItems.setTotalAmount(totalAmount.get());
+        }
 
         cartItemsProducts.setCartItems(cartItems);
 
@@ -277,7 +299,19 @@ public class CartServiceImpl implements CartService {
                                                         .findFirst().get();
 
         cartItems.setQuantity(cartItems.getQuantity() - cartItemsProducts.getQuantity());
-        cartItems.setPrice(cartItems.getPrice() - (cartItemsProducts.getQuantity() * cartItemsProducts.getProduct().getPrice()));
+
+        cartItems.setAmount(cartItems.getAmount() - (cartItemsProducts.getQuantity() * cartItemsProducts.getProduct().getPrice()));
+
+        if(cartItems.getCoupon() != null) {
+            double discountAmount = ((cartItems.getCoupon().getDiscount() / 100.0) * cartItems.getTotalAmount());
+            double netAmount = cartItems.getAmount() - discountAmount;
+
+            cartItems.setDiscount(discountAmount);
+            cartItems.setTotalAmount(netAmount);
+        }
+        else {
+            cartItems.setTotalAmount(cartItems.getAmount());
+        }
 
         cartItems.getCartItemsProducts().remove(cartItemsProducts);
 

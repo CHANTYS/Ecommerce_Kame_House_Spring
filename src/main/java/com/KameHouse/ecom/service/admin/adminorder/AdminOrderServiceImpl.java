@@ -36,6 +36,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
             orderDto.setAddress(order.getAddress());
             orderDto.setStatus(order.getStatus());
             orderDto.setUserName(order.getUser().getName());
+            orderDto.setTotalAmount(order.getTotalAmount());
             return orderDto;
         }).collect(Collectors.toList());
     }

@@ -14,18 +14,10 @@ import java.util.List;
 @RequestMapping("/api/customer")
 @RequiredArgsConstructor
 public class CustomerCouponController {
-
-
     private final CustomerCouponService customerCouponService;
 
     @GetMapping("/coupon/{userId}/{code}")
     public ResponseEntity<?> applyCoupon(@PathVariable Long userId, @PathVariable String code) {
-        try {
-            OrderDto orderDto = customerCouponService.applyCoupon(userId,code);
-            return ResponseEntity.ok(orderDto);
-        } catch (ValidationException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+        return customerCouponService.applyCoupon(userId,code);
     }
-
 }

@@ -57,7 +57,7 @@ public class Order {
         orderDto.setPayment(payment);
         orderDto.setStatus(status);
         orderDto.setUserName(user.getName());
-        if(coupon != null){
+        if(coupon != null) {
             orderDto.setCouponName(coupon.getName());
         }
         return orderDto;

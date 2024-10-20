@@ -9,9 +9,15 @@ import java.util.Set;
 public class GetCartItemDto {
     private Long id;
 
-    private Double price;
+    private Double totalAmount;
 
     private Long quantity;
+
+    private String couponName;
+
+    private Double discount;
+
+    private Double amount;
 
     private Set<GetProductDto> productDtos = new HashSet<>();
 }
