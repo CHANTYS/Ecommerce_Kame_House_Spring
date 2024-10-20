@@ -54,7 +54,9 @@ public class CartItemsProducts {
         GetCartItemDto dto = new GetCartItemDto();
         dto.setId(cartItems.getId());
         dto.setQuantity(cartItems.getQuantity());
-        dto.setPrice(cartItems.getPrice());
+        dto.setTotalAmount(cartItems.getTotalAmount());
+        dto.setAmount(cartItems.getAmount());
+        dto.setDiscount(cartItems.getDiscount());
 
         cartItems.getCartItemsProducts().forEach(item -> {
             GetProductDto productDto = new GetProductDto();

@@ -1,9 +1,9 @@
 package com.KameHouse.ecom.service.customer.coupon;
 
-import com.KameHouse.ecom.dto.OrderDto;
+import org.springframework.http.ResponseEntity;
 
 public interface CustomerCouponService {
 
-    OrderDto applyCoupon(Long userId, String code);
+    ResponseEntity<?> applyCoupon(Long userId, String code);
 
 }

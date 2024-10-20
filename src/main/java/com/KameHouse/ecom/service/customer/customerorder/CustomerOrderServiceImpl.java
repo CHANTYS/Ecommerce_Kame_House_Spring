@@ -63,6 +63,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         order.setQuantity(totalQuantity.get());
         order.setUser(user.get());
         order.setProducts(productSet.stream().toList());
+        order.setCoupon(cartItem.getCoupon());
 
         Order newOrder = orderRepository.save(order);
 

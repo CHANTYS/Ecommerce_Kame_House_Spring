@@ -6,9 +6,11 @@ import com.KameHouse.ecom.entity.Coupon;
 import com.KameHouse.ecom.entity.Order;
 import com.KameHouse.ecom.enums.OrderStatus;
 import com.KameHouse.ecom.exceptions.ValidationException;
+import com.KameHouse.ecom.repo.CartRepository;
 import com.KameHouse.ecom.repo.CouponRepository;
 import com.KameHouse.ecom.repo.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -19,24 +21,26 @@ public class CustomerCouponServiceImpl implements CustomerCouponService {
 
     private final CouponRepository couponRepository;
 
-    private final OrderRepository orderRepository;
+    private final CartRepository cartRepository;
 
-    public OrderDto applyCoupon(Long userId, String code) {
-        Order order = orderRepository.findByUserIdAndStatus(userId, OrderStatus.Pending);
+
+    public ResponseEntity<?> applyCoupon(Long userId, String code) {
         Coupon coupon = couponRepository.findByCode(code).orElseThrow(() -> new ValidationException("Coupon not found."));
 
-        if (couponIsExpired(coupon)) {
-            throw new ValidationException("Coupon has expired.");
-        }
-        double discountAmount = ((coupon.getDiscount() / 100.0) * order.getTotalAmount());
-        double netAmount = order.getTotalAmount() - discountAmount;
+        if (couponIsExpired(coupon))
+            return ResponseEntity.notFound().build();
 
-        order.setTotalAmount(netAmount);
-        order.setDiscount(discountAmount);
-        order.setCoupon(coupon);
+        var cartItems = cartRepository.findByUserId(userId);
 
-        orderRepository.save(order);
-        return order.getOrderDto();
+        double discountAmount = ((coupon.getDiscount() / 100.0) * cartItems.getTotalAmount());
+        double netAmount = cartItems.getTotalAmount() - discountAmount;
+
+        cartItems.setDiscount(discountAmount);
+        cartItems.setTotalAmount(netAmount);
+        cartItems.setCoupon(coupon);
+
+        cartRepository.save(cartItems);
+        return ResponseEntity.ok().body(cartItems.GetCartItemDto());
     }
 
     private boolean couponIsExpired(Coupon coupon) {
