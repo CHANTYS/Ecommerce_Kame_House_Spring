@@ -26,7 +26,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     private final CartRepository cartRepository;
     private final CartItemsProductsRepository cartItemsProductsRepository;
     private final ProductRepository productRepository;
-
+    private final CouponRepository couponRepository;
     @Override
     public ResponseEntity<?> PlaceOrder(PlaceOrderDto placeOrderDto) {
         var user = userRepository.findById(placeOrderDto.getUserId());
@@ -74,6 +74,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         productRepository.saveAll(productsWithNewOrder);
 
+        cartItem.setCoupon(null);
         cartItemsProductsRepository.deleteAll(cartItem.getCartItemsProducts());
         cartRepository.delete(cartItem);
 
