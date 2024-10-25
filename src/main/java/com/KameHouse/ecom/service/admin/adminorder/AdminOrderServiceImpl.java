@@ -38,7 +38,10 @@ public class AdminOrderServiceImpl implements AdminOrderService {
             orderDto.setUserName(order.getUser().getName());
             orderDto.setTotalAmount(order.getTotalAmount());
             return orderDto;
-        }).collect(Collectors.toList());
+        })
+        .sorted(Comparator.nullsLast(
+            (o1, o2) -> o2.getDate().compareTo(o1.getDate())))
+        .collect(Collectors.toList());
     }
 
     @Override
