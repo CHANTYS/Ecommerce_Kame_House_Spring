@@ -22,7 +22,7 @@ public class Reviews {
     private String description;
 
     @Lob
-    @Column(columnDefinition = "longblob")
+    @Column(columnDefinition = "longblob", nullable = true)
     private byte[] img;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

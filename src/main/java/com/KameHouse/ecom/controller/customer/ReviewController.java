@@ -26,7 +26,10 @@ public class ReviewController {
     @PostMapping("/review")
     public ResponseEntity<?> giveReview(@ModelAttribute ReviewDto reviewDto) throws IOException {
         ReviewDto reviewedDto = reviewService.giveReview(reviewDto);
-        if (reviewedDto == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong");
+
+        if (reviewedDto == null) 
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong");
+            
         return ResponseEntity.status(HttpStatus.CREATED).body(reviewedDto);
     }
 
