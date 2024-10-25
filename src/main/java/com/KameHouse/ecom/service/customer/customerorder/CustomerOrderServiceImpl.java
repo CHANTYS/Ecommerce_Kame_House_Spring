@@ -49,17 +49,15 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         order.setAddress(placeOrderDto.getAddress());
 
         Set<Product> productSet = new HashSet<>();
-        AtomicReference<Double> totalAmount = new AtomicReference<>(0D);
         AtomicReference<Long> totalQuantity = new AtomicReference<>(0L);
 
         cartItem.getCartItemsProducts().forEach(x -> {
             productSet.add(x.getProduct());
-            totalAmount.updateAndGet(v -> v + x.getProduct().getPrice() * x.getQuantity());
             totalQuantity.updateAndGet(v -> v + x.getQuantity());
         });
 
-        order.setTotalAmount(totalAmount.get());
-        order.setPayment(totalAmount.get().toString());
+        order.setTotalAmount(cartItem.getTotalAmount());
+        order.setPayment(cartItem.getTotalAmount().toString());
         order.setQuantity(totalQuantity.get());
         order.setUser(user.get());
         order.setProducts(productSet.stream().toList());
@@ -105,7 +103,12 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     @Override
     public List<OrderDto> getMyPlacedOrders(Long userId) {
-        return orderRepository.findAllByUserIdAndStatusIn(userId, List.of(OrderStatus.Placed, OrderStatus.Shipped, OrderStatus.Delivered)).stream().map(Order::getOrderDto).collect(Collectors.toList());
+        return orderRepository.findAllByUserIdAndStatusIn(userId, List.of(OrderStatus.Placed, OrderStatus.Shipped, OrderStatus.Delivered))
+                            .stream()
+                            .map(Order::getOrderDto)
+                            .sorted(Comparator.nullsLast(
+                                        (o1, o2) -> o2.getDate().compareTo(o1.getDate())))
+                            .collect(Collectors.toList());
     }
 
     @Override
