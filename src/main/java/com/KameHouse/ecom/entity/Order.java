@@ -35,6 +35,8 @@ public class Order {
 
     private UUID trackingId;
 
+    private String paymentId;
+
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "coupon_id", referencedColumnName = "id")
     private Coupon coupon;
@@ -58,6 +60,7 @@ public class Order {
         orderDto.setStatus(status);
         orderDto.setUserName(user.getName());
         orderDto.setTotalAmount(totalAmount);
+        orderDto.setPaymentId(paymentId);
         if(coupon != null) {
             orderDto.setCouponName(coupon.getName());
         }

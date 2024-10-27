@@ -44,8 +44,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             return ResponseEntity.notFound().build();
 
         var cartItem = cartRepository.findByUserId(user.get().getId());
-
+        
         MercadoPagoConfig.setAccessToken("APP_USR-3766041123444579-102700-35dd8c7776eb5359f625f78f8e3fe4f6-2058551287");
+        
         
         List<PreferenceItemRequest> items = new ArrayList<>();
 
@@ -64,9 +65,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         });
 
         PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
-                                                                      .success("http://localhost:4200/")
-                                                                      .pending("http://localhost:4200/")
-                                                                      .failure("http://localhost:4200/")
+                                                                      .success("http://localhost:4200/customer/purchase-mp")
+                                                                      .pending("http://localhost:4200/customer/purchase-mp")
+                                                                      .failure("http://localhost:4200/customer/purchase-mp")
                                                                       .build();
 
         PreferenceRequest preferenceRequest = PreferenceRequest.builder()
@@ -119,6 +120,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         order.setUser(user.get());
         order.setProducts(productSet.stream().toList());
         order.setCoupon(cartItem.getCoupon());
+        order.setPaymentId(placeOrderDto.getPaymentId());
 
         Order newOrder = orderRepository.save(order);
 
