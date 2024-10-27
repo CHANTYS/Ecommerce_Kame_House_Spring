@@ -45,7 +45,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         var cartItem = cartRepository.findByUserId(user.get().getId());
 
-        MercadoPagoConfig.setAccessToken("APP_USR-3236047960702707-102613-9803d28b1f200b3667654797aeb68998-199337610");
+        MercadoPagoConfig.setAccessToken("APP_USR-3766041123444579-102700-35dd8c7776eb5359f625f78f8e3fe4f6-2058551287");
         
         List<PreferenceItemRequest> items = new ArrayList<>();
 
