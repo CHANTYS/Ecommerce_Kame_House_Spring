@@ -18,6 +18,10 @@ public class CustomerOrderController {
 
     private final CustomerOrderService customerOrderService;
 
+    @GetMapping("/createPreference/{userId}")
+    public ResponseEntity<?> createPreferenceMP(@PathVariable Long userId) {
+        return customerOrderService.CreatePreferenceMP(userId);
+    }
     @PostMapping("/placeOrder")
     public ResponseEntity<?> placeOrder(@RequestBody PlaceOrderDto placeOrderDto) {
         return customerOrderService.PlaceOrder(placeOrderDto);
