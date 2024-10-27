@@ -35,4 +35,6 @@ public class OrderDto {
 
     private Long discount;
     private String couponName;
+
+    private String paymentId;
 }
