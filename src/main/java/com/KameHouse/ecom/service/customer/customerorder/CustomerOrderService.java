@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CustomerOrderService {
+    ResponseEntity<?> CreatePreferenceMP(Long userId);
 
     ResponseEntity<?> PlaceOrder(PlaceOrderDto placeOrderDto);
 

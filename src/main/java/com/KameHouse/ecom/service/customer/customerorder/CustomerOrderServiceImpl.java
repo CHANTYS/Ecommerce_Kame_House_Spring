@@ -4,18 +4,22 @@ import com.KameHouse.ecom.dto.OrderDto;
 import com.KameHouse.ecom.dto.PlaceOrderDto;
 import com.KameHouse.ecom.entity.Order;
 import com.KameHouse.ecom.entity.Product;
-import com.KameHouse.ecom.entity.User;
 import com.KameHouse.ecom.enums.OrderStatus;
 import com.KameHouse.ecom.repo.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.stream.Collectors;
+import com.mercadopago.MercadoPagoConfig;
+import com.mercadopago.client.preference.PreferenceBackUrlsRequest;
+import com.mercadopago.client.preference.PreferenceClient;
+import com.mercadopago.client.preference.PreferenceItemRequest;
+import com.mercadopago.client.preference.PreferenceRequest;
+import com.mercadopago.resources.preference.Preference;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +30,60 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     private final CartRepository cartRepository;
     private final CartItemsProductsRepository cartItemsProductsRepository;
     private final ProductRepository productRepository;
-    private final CouponRepository couponRepository;
+
+    @Override
+    public ResponseEntity<?> CreatePreferenceMP(Long userId) {
+        var user = userRepository.findById(userId);
+
+        if (!user.isPresent())
+            return ResponseEntity.notFound().build();
+
+        var existsCartItem = cartRepository.existsByUserId(user.get().getId());
+
+        if (!existsCartItem)
+            return ResponseEntity.notFound().build();
+
+        var cartItem = cartRepository.findByUserId(user.get().getId());
+
+        MercadoPagoConfig.setAccessToken("APP_USR-3236047960702707-102613-9803d28b1f200b3667654797aeb68998-199337610");
+        
+        List<PreferenceItemRequest> items = new ArrayList<>();
+
+        cartItem.getCartItemsProducts().forEach(x -> {
+            Product product = x.getProduct();
+            PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
+                                                                     .title(product.getName())
+                                                                     .description(product.getDescription())
+                                                                     .categoryId(product.getCategory().getName())
+                                                                     .quantity(Integer.parseInt(x.getQuantity().toString()))
+                                                                     .currencyId("ARS")
+                                                                     .unitPrice(new BigDecimal(product.getPrice()))
+                                                                     .build();
+
+            items.add(itemRequest);
+        });
+
+        PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
+                                                                      .success("http://localhost:4200/")
+                                                                      .pending("http://localhost:4200/")
+                                                                      .failure("http://localhost:4200/")
+                                                                      .build();
+
+        PreferenceRequest preferenceRequest = PreferenceRequest.builder()
+                                                                .items(items)
+                                                                .backUrls(backUrls)
+                                                                .build();
+        PreferenceClient client = new PreferenceClient();
+
+        try {
+            Preference preference = client.create(preferenceRequest);
+            return ResponseEntity.ok(preference.getId());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("ocurrio un error en el pago");
+        }
+    }
+
+
     @Override
     public ResponseEntity<?> PlaceOrder(PlaceOrderDto placeOrderDto) {
         var user = userRepository.findById(placeOrderDto.getUserId());
