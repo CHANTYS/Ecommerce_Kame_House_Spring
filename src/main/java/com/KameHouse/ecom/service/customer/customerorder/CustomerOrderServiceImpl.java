@@ -77,7 +77,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
         try {
             Preference preference = client.create(preferenceRequest);
-            return ResponseEntity.ok(preference.getId());
+            return ResponseEntity.ok(preference);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("ocurrio un error en el pago");
         }
