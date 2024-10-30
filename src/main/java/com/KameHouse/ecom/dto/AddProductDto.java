@@ -21,6 +21,8 @@ public class AddProductDto {
     private MultipartFile img;
 
     private byte[] returnedImg;
+    
+    private String fileName;
 
     private String categoryId;
 

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.Base64;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class AdminProductServiceImpl implements AdminProductService {
         product.setPrice(addProductDto.getPrice());
         product.setDescription(addProductDto.getDescription());
         product.setImg(addProductDto.getImg().getBytes());
+        product.setFileName(addProductDto.getFileName());
         Category category = categoryRepository.findById(Long.parseLong(addProductDto.getCategoryId())).orElseThrow(() -> new RuntimeException("Category not found"));
         product.setCategory(category);
         return productRepository.save(product);
@@ -46,6 +48,7 @@ public class AdminProductServiceImpl implements AdminProductService {
             productDto.setCategoryId(product.getCategory().getId());
             productDto.setCategoryName(product.getCategory().getName());
             productDto.setReturnedImg(product.getImg());
+            productDto.setFileName(product.getFileName());
             return productDto;
         }).collect(Collectors.toList());
     }
@@ -110,6 +113,7 @@ public class AdminProductServiceImpl implements AdminProductService {
             productDto.setCategoryId(product.getCategory().getId());
             productDto.setCategoryName(product.getCategory().getName());
             productDto.setReturnedImg(product.getImg());
+            productDto.setFileName(product.getFileName());
             return productDto;
         }).collect(Collectors.toList());
     }

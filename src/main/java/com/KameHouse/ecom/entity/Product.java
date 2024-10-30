@@ -58,6 +58,15 @@ public class Product {
         this.description = description;
     }
 
+
+    private String fileName;
+    public String getFileName() {
+        return fileName;
+    }
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
     @Lob
     @Column(columnDefinition = "longblob")
     private byte[] img;
@@ -116,6 +125,7 @@ public class Product {
         productDto.setReturnedImg(img);
         productDto.setCategoryId(category.getId());
         productDto.setCategoryName(category.getName());
+        productDto.setFileName(fileName);
         return productDto;
     }
 }
